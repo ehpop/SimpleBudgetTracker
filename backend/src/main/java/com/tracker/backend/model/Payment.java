@@ -33,4 +33,11 @@ public class Payment {
   private String userId;
   private String category;
 
+  public void updatePayment(Payment payment) {
+    this.name = payment.getName();
+    this.description = payment.getDescription();
+    this.amount = payment.getAmount();
+    this.date = payment.getDate();
+    this.category = payment.getCategory();
+  }
 }
