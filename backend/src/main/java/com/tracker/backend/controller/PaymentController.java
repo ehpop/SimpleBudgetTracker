@@ -3,10 +3,8 @@ package com.tracker.backend.controller;
 import com.tracker.backend.model.Payment;
 import com.tracker.backend.service.PaymentService;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,9 +42,15 @@ public class PaymentController {
     }
 
     log.debug("Adding payment: {}", payment);
-    paymentService.add(payment);
-    log.debug("Payment added: {}", payment);
-    return new ResponseEntity<>(payment, HttpStatus.CREATED);
+    try{
+      paymentService.add(payment);
+      log.debug("Payment added: {}", payment);
+      return new ResponseEntity<>(payment, HttpStatus.CREATED);
+    }catch (Exception e){
+      log.debug("Payment not added: {} error: {}", payment, e.getMessage());
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
   }
 
   @GetMapping("/{id}")
@@ -73,6 +77,9 @@ public class PaymentController {
     } catch (NoSuchElementException e) {
       log.debug("Payment with id {} not found, cannot update", id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      log.debug("Payment with id {} not updated, error: {}", id, e.getMessage());
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
   }
 

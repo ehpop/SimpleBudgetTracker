@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Date;
+import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,25 +33,31 @@ public class Payment {
 
   @Column(nullable = false)
   @NotNull
+  @NotEmpty
   private String name;
 
   @Column(nullable = false)
   @NotNull
+  @NotEmpty
   private String description;
 
   @Column(nullable = false)
+  @NotEmpty
   @NotNull
   private Double amount;
 
   @Column(nullable = false)
+  @NotEmpty
   @NotNull
   private Date date;
 
   @Column(nullable = false)
+  @NotEmpty
   @NotNull
   private String userId;
 
   @Column(nullable = false)
+  @NotEmpty
   @NotNull
   private String category;
 
