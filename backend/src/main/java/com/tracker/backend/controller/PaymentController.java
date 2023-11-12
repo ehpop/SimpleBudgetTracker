@@ -2,9 +2,15 @@ package com.tracker.backend.controller;
 
 import com.tracker.backend.model.Payment;
 import com.tracker.backend.service.PaymentService;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,44 +29,70 @@ public class PaymentController {
   private final PaymentService paymentService;
 
   @GetMapping
-  public Collection<Payment> findAll(){
-    log.info("Finding all payments");
-    return paymentService.findAll();
+  public ResponseEntity<List<Payment>> findAll() {
+    log.debug("Finding all payments");
+    var payments = new ArrayList<>(paymentService.findAll());
+    log.debug("Found all payments: {}", payments);
+    return new ResponseEntity<>(payments, HttpStatus.OK);
   }
 
   @PostMapping
-  public void add(@RequestBody Payment payment){
-    log.info("Adding payment: {}", payment);
+  public ResponseEntity<Payment> add(@RequestBody Payment payment) {
+    if (payment.getId() != null) {
+      log.debug("Payment id must be null");
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    log.debug("Adding payment: {}", payment);
     paymentService.add(payment);
-    log.info("Payment added: {}", payment);
+    log.debug("Payment added: {}", payment);
+    return new ResponseEntity<>(payment, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")
-  public Payment findById(@PathVariable Integer id) {
+  public ResponseEntity<Payment> findById(@PathVariable Integer id) {
     log.debug("Finding payment by id {}", id);
-    Payment payment = paymentService.findById(id);
-    log.debug("Found payment by id {}: {}", id, payment);
-    return payment;
+    try {
+      Payment payment = paymentService.findById(id);
+      log.debug("Found payment by id {}: {}", id, payment);
+      return new ResponseEntity<>(payment, HttpStatus.OK);
+    } catch (NoSuchElementException e) {
+      log.debug("Payment with id {} not found", id);
+    }
+
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @PutMapping("/{id}")
-  public void update(@PathVariable Integer id, @RequestBody Payment payment) {
+  public ResponseEntity<Payment> update(@PathVariable Integer id, @RequestBody Payment payment) {
     log.debug("Updating payment with id {}: {}", id, payment);
-    paymentService.update(id, payment);
-    log.debug("Payment with id {} updated", id);
+    try {
+      paymentService.update(id, payment);
+      log.debug("Payment with id {} updated", id);
+      return new ResponseEntity<>(payment, HttpStatus.OK);
+    } catch (NoSuchElementException e) {
+      log.debug("Payment with id {} not found, cannot update", id);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
   }
 
   @DeleteMapping("/{id}")
-  public void delete(@PathVariable Integer id) {
-    log.debug("Deleting payment with id {}", id);
-    paymentService.delete(id);
-    log.debug("Payment with id {} deleted", id);
+  public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    try {
+      log.debug("Deleting payment with id {}", id);
+      paymentService.delete(id);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (NoSuchElementException e) {
+      log.debug("Payment with id {} not found, cannot delete", id);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
   }
 
   @DeleteMapping
-  public void deleteAll() {
+  public ResponseEntity<Void> deleteAll() {
     log.debug("Deleting all payments");
     paymentService.deleteAll();
     log.debug("All payments deleted");
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 }
