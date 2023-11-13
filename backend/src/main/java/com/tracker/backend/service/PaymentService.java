@@ -1,6 +1,7 @@
 package com.tracker.backend.service;
 
-import com.tracker.backend.model.Payment;
+import com.tracker.backend.dto.PaymentDTO;
+import com.tracker.backend.mapper.PaymentMapper;
 import com.tracker.backend.repository.PaymentRepository;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
@@ -11,30 +12,35 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+
   private final PaymentRepository paymentRepository;
+  private final PaymentMapper paymentMapper;
 
-  public Collection<Payment> findAll(){
+  public Collection<PaymentDTO> findAll() {
     log.info("Finding all payments");
-    return paymentRepository.findAll();
+    return paymentRepository.findAll().stream()
+        .map(paymentMapper::paymentToPaymentDTO)
+        .toList();
   }
 
-  public void add(Payment payment){
-    log.info("Adding payment: {}", payment);
-    paymentRepository.save(payment);
-    log.info("Payment added: {}", payment);
+  public PaymentDTO add(PaymentDTO paymentDTO) {
+    log.info("Adding payment: {}", paymentDTO);
+    var addedPayment = paymentRepository.save(paymentMapper.paymentDTOToPayment(paymentDTO));
+    log.info("Payment added: {}", addedPayment);
+    return paymentMapper.paymentToPaymentDTO(addedPayment);
   }
 
-  public Payment findById(Integer id) {
+  public PaymentDTO findById(Integer id) {
     log.info("Finding payment by id {}", id);
     var payment = paymentRepository.findById(id);
     log.info("Found payment by id {}: {}", id, paymentRepository.findById(id));
-    return payment.orElseThrow();
+    return payment.map(paymentMapper::paymentToPaymentDTO).orElseThrow();
   }
 
-  public void update(Integer id, Payment payment) {
-    log.info("Updating payment with id {}: {}", id, payment);
+  public void update(Integer id, PaymentDTO paymentDTO) {
+    log.info("Updating payment with id {}: {}", id, paymentDTO);
     var paymentToUpdate = paymentRepository.findById(id).orElseThrow();
-    paymentToUpdate.updatePayment(payment);
+    paymentToUpdate.updatePayment(paymentMapper.paymentDTOToPayment(paymentDTO));
     paymentRepository.save(paymentToUpdate);
     log.info("Payment with id {} updated", id);
   }
