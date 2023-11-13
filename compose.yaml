@@ -1,0 +1,44 @@
+services:
+  postgres-db:
+    container_name: postgres-db
+    image: 'postgres:16.0-alpine'
+    restart: always
+    environment:
+      POSTGRES_DB: postgres_backend_db
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_USER: backend_admin
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/postgres_backend_db
+    volumes:
+      - 'postgres-db:/var/lib/postgresql/data_postgres_backend_db'
+    ports:
+      - '5432:5432'
+    networks:
+        - backend-network
+    healthcheck:
+      test: pg_isready -d postgres_backend_db -U backend_admin
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend-service:
+    build: backend
+    container_name: backend-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/postgres_backend_db
+      SPRING_DATASOURCE_USERNAME: backend_admin
+      SPRING_DATASOURCE_PASSWORD: passwd
+    ports:
+      - '8080:8080'
+    networks:
+      - backend-network
+    depends_on:
+        postgres-db:
+          condition: service_healthy
+
+volumes:
+  postgres-db:
+    driver: local
+
+networks:
+  backend-network:
+    driver: bridge
