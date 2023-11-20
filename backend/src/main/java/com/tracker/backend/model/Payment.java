@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,7 @@ public class Payment {
   @Column(nullable = false)
   @NotEmpty
   @NotNull
-  private Date date;
+  private OffsetDateTime date;
 
   @Column(nullable = false)
   @NotEmpty
