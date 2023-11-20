@@ -27,7 +27,7 @@ public class PaymentDTO {
   @JsonView({Views.Post.class, Views.Put.class, Views.Get.class})
   Double amount;
 
-  @Schema(description = "Date of the payment.", example = "2021-10-28")
+  @Schema(description = "Date of the payment.", example = "2021-01-01T00:00:00.000Z")
   @JsonView({Views.Post.class, Views.Put.class, Views.Get.class})
   String date;
 
