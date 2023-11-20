@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,9 +36,12 @@ public class PaymentController {
   private final PaymentService paymentService;
 
   @Operation(description = "Returns all payments", tags = {"Payments", "Get"})
-  @ApiResponse(responseCode = "200", description = "Successfully retrieved payments", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PaymentDTO.class))))
-  @JsonView(Views.Get.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(responseCode = "200", description = "Successfully retrieved payments", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PaymentDTO.class))))
+      })
   @GetMapping
+  @JsonView(Views.Get.class)
   public ResponseEntity<List<PaymentDTO>> findAll() {
     log.debug("Finding all payments");
     var payments = new ArrayList<>(paymentService.findAll());
@@ -52,9 +56,10 @@ public class PaymentController {
           @ApiResponse(responseCode = "400", description = "Bad request (e.g., invalid payment data)")
       }
   )
-  @JsonView(Views.Post.class)
   @PostMapping
-  public ResponseEntity<PaymentDTO> add(@RequestBody PaymentDTO payment) {
+  @JsonView(Views.Get.class)
+  public ResponseEntity<PaymentDTO> add(
+      @RequestBody @Valid @JsonView({Views.Post.class}) PaymentDTO payment) {
     if (payment.getId() != null) {
       log.debug("Payment id must be null");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -73,12 +78,13 @@ public class PaymentController {
   }
 
   @Operation(description = "Get a specific payment by ID", tags = {"Payments", "Get"})
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Payment retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-      @ApiResponse(responseCode = "404", description = "Payment not found")
-  })
-  @JsonView(Views.Get.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(responseCode = "200", description = "Payment retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
+          @ApiResponse(responseCode = "404", description = "Payment not found")
+      })
   @GetMapping("/{id}")
+  @JsonView(Views.Get.class)
   public ResponseEntity<PaymentDTO> findById(@PathVariable Integer id) {
     log.debug("Finding payment by id {}", id);
     try {
@@ -93,13 +99,14 @@ public class PaymentController {
   }
 
   @Operation(description = "Update payment information by ID", tags = {"Payments", "Put"})
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Payment updated successfully"),
-      @ApiResponse(responseCode = "400", description = "Bad request (e.g., invalid payment data)"),
-      @ApiResponse(responseCode = "404", description = "Payment not found"),
-  })
-  @JsonView(Views.Put.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(responseCode = "200", description = "Payment updated successfully"),
+          @ApiResponse(responseCode = "400", description = "Bad request (e.g., invalid payment data)"),
+          @ApiResponse(responseCode = "404", description = "Payment not found"),
+      })
   @PutMapping("/{id}")
+  @JsonView(Views.Put.class)
   public ResponseEntity<PaymentDTO> update(@PathVariable Integer id,
       @RequestBody PaymentDTO payment) {
     log.debug("Updating payment with id {}: {}", id, payment);
@@ -117,10 +124,11 @@ public class PaymentController {
   }
 
   @Operation(description = "Delete a payment by ID", tags = {"Payments", "Delete"})
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Payment deleted successfully"),
-      @ApiResponse(responseCode = "404", description = "Payment not found")
-  })
+  @ApiResponses(
+      value = {
+          @ApiResponse(responseCode = "204", description = "Payment deleted successfully"),
+          @ApiResponse(responseCode = "404", description = "Payment not found")
+      })
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable Integer id) {
     try {
@@ -134,9 +142,10 @@ public class PaymentController {
   }
 
   @Operation(description = "Delete all payments", tags = {"Payments", "Delete"})
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "All payments deleted successfully")
-  })
+  @ApiResponses(
+      value = {
+          @ApiResponse(responseCode = "204", description = "All payments deleted successfully")
+      })
   @DeleteMapping
   public ResponseEntity<Void> deleteAll() {
     log.debug("Deleting all payments");
