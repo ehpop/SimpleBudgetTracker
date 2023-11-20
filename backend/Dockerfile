@@ -1,5 +1,12 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM openjdk:17-jdk-alpine
+
+RUN apk add --no-cache maven
+
 WORKDIR /backend
-COPY 'target/backend-0.0.1-SNAPSHOT.jar' .
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","backend-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
