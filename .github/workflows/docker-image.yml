@@ -41,5 +41,5 @@ jobs:
 
       - name: Deploy to Container
         run: |
-          docker build -t your-image-name:latest .
-          docker run -p 8080:8080 -d your-image-name:latest
+          docker build -t backend:latest backend
+          docker run -p 8080:8080 -d backend:latest
