@@ -3,7 +3,11 @@ import {Col, Form, InputGroup, Row, Stack} from "react-bootstrap";
 import {useState} from "react";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
-import {getDateFromDateTimeString} from "../utils/DateTimeUtils";
+import {
+    getDateFromDateTimeString,
+    getDateTimeStringFromDate,
+    getDateTimeStringFromDateAndTime
+} from "../utils/DateTimeUtils";
 
 export interface IPayment {
     id: number;
@@ -21,7 +25,6 @@ interface IPaymentProps {
 }
 
 
-
 function Payment(props: IPaymentProps) {
     let [payment, isEditable] = [props.payment, props.isEditable];
     const [date, setDate] = useState(getDateFromDateTimeString(payment.date));
@@ -29,6 +32,7 @@ function Payment(props: IPaymentProps) {
     const [isEditButtonDisabled, setIsEditButtonDisabled] = useState(false);
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(isEditable);
 
+    let [formData, setFormData] = useState<IPayment>({...payment});
 
     function onSaveWhenEditable() {
         axios.put('http://localhost:8080/payments/' + payment.id, {
@@ -52,12 +56,12 @@ function Payment(props: IPaymentProps) {
 
     function onSaveWhenNotEditable() {
         axios.post('http://localhost:8080/payments', {
-            "name": payment.name,
-            "description": payment.description,
-            "amount": payment.amount,
-            "date": payment.date,
-            "userId": payment.userId,
-            "category": payment.category
+            "name": formData.name,
+            "description": formData.description,
+            "amount": formData.amount,
+            "date": getDateTimeStringFromDate(formData.date),
+            "userId": formData.userId,
+            "category": formData.category
         }).then(function (response) {
             //TODO: create pop up with confirmation
             console.log(response);
@@ -96,8 +100,14 @@ function Payment(props: IPaymentProps) {
                             <InputGroup.Text id="basic-addon3">
                                 Name
                             </InputGroup.Text>
-                            <Form.Control id={payment.id.toString()} aria-describedby="basic-addon3"
-                                          placeholder={payment.name.toString()} disabled={isDisabled}/>
+                            <Form.Control id={payment.id.toString()}
+                                          aria-describedby="basic-addon3"
+                                          placeholder={payment.name.toString()}
+                                          disabled={isDisabled}
+                                          onChange={(e) => {
+                                              setFormData({...formData, name: e.target.value});
+                                          }}
+                            />
                         </InputGroup>
                     </Col>
                     <Col>
@@ -105,8 +115,14 @@ function Payment(props: IPaymentProps) {
                             <InputGroup.Text id="basic-addon3">
                                 Category
                             </InputGroup.Text>
-                            <Form.Control id={payment.id.toString()} aria-describedby="basic-addon3"
-                                          placeholder={payment.category.toString()} disabled={isDisabled}/>
+                            <Form.Control id={payment.id.toString()}
+                                          aria-describedby="basic-addon3"
+                                          placeholder={payment.category.toString()}
+                                          disabled={isDisabled}
+                                          onChange={(e) => {
+                                              setFormData({...formData, category: e.target.value});
+                                          }}
+                            />
                         </InputGroup>
                     </Col>
                     <Col>
@@ -119,7 +135,10 @@ function Payment(props: IPaymentProps) {
                                 id={payment.id.toString()}
                                 aria-describedby="basic-addon3"
                                 value={date}  // Set the initial value or default date
-                                onChange={(e) => {setDate(e.target.value)}}
+                                onChange={(e) => {
+                                    setDate(e.target.value);
+                                    setFormData({...formData, date: e.target.value});
+                                }}
                                 disabled={isDisabled}
                             />
                         </InputGroup>
@@ -132,8 +151,15 @@ function Payment(props: IPaymentProps) {
                             <InputGroup.Text id="basic-addon3">
                                 Amount
                             </InputGroup.Text>
-                            <Form.Control aria-label="Amount (to the nearest dollar)" disabled={isDisabled}
-                                          placeholder={Math.abs(payment.amount).toString()}/>
+                            <Form.Control aria-label="Amount (to the nearest pln)"
+                                          disabled={isDisabled}
+                                          placeholder={Math.abs(payment.amount).toString()}
+                                          type="number"
+                                          min="0"
+                                          onChange={(e) => {
+                                              setFormData({...formData, amount: Number.parseInt(e.target.value)});
+                                          }}
+                            />
                             <InputGroup.Text>PLN</InputGroup.Text>
                             <InputGroup.Text>.00</InputGroup.Text>
                         </InputGroup>
@@ -151,7 +177,8 @@ function Payment(props: IPaymentProps) {
                 <Row>
                     <InputGroup className="mb-2">
                         <InputGroup.Text>Description</InputGroup.Text>
-                        <Form.Control as="textarea" aria-label="With textarea" placeholder={payment.description.toString()}
+                        <Form.Control as="textarea" aria-label="With textarea"
+                                      placeholder={payment.description.toString()}
                                       disabled={isDisabled}/>
                     </InputGroup>
                 </Row>

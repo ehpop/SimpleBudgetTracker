@@ -4,58 +4,31 @@ import Button from "react-bootstrap/Button";
 import axios from "axios";
 
 import "../styles/Payments.css"
-
-const getData = async () => {
-    axios.get('http://localhost:8080/payments')
-        .then(function (response) {
-            console.log(response);
-            return response;
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-}
+import {useEffect, useState} from "react";
 
 function Payments() {
-    const data: Array<IPayment> = [{
-        "id": 1,
-        "name": "Rent",
-        "description": "Monthly rent payment.",
-        "amount": 1000.0,
-        "date": "2021-01-01T00:00Z",
-        "userId": "1",
-        "category": "Living expenses"
-    }, {
-        "id": 2,
-        "name": "Rent",
-        "description": "Monthly rent payment.",
-        "amount": 1000.0,
-        "date": "2021-01-01T00:00Z",
-        "userId": "1",
-        "category": "Living expenses"
-    }, {
-        "id": 53,
-        "name": "Rent",
-        "description": "Monthly rent payment.",
-        "amount": 1000.0,
-        "date": "2021-01-01T00:00Z",
-        "userId": "1",
-        "category": "Living expenses"
-    }, {
-        "id": 54,
-        "name": "Rent",
-        "description": "Monthly rent payment.",
-        "amount": 1000.0,
-        "date": "2021-01-01T00:00Z",
-        "userId": "1",
-        "category": "Living expenses"
-    }];
+    const [payments, setPayments] = useState<Array<IPayment>>([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:8080/payments')
+            .then(function (response) {
+                console.log(response);
+                setPayments(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+    }, []);
 
     return (
         <Accordion>
-            {data.map((payment, index) => {
-                return <PaymentAcordBody key={index} id={index + 1} payment={payment}/>
-            })}
+            {payments.length == 0
+                ? <h1>No payments</h1>
+                : payments.map((payment, index) => {
+                    return <PaymentAcordBody id={index + 1} payment={payment}/>
+                })
+            }
         </Accordion>
     );
 }
