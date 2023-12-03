@@ -16,7 +16,7 @@ function App() {
                 <Route path="/" element={<Home/>}/>
                 <Route path="home" element={<Home/>}/>
                 <Route path="payments" element={<Payments/>}/>
-                <Route path="charts" element={<Charts/>}/>
+                <Route path="charts/:type" element={<Charts/>}/>
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
         </div>

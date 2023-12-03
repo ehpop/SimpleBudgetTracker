@@ -16,8 +16,8 @@ function Home() {
 
     return (
         <div>
-            <h1>Home</h1>
-            <Payment {...payment}/>
+            <h1>Add payment</h1>
+            <Payment payment={payment} isEditable={true}/>
         </div>
     );
 }
