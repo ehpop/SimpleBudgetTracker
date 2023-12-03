@@ -1,8 +1,9 @@
 import "../styles/Payment.css"
-import {Form, InputGroup, Stack} from "react-bootstrap";
+import {Col, Form, InputGroup, Row, Stack} from "react-bootstrap";
 import {useState} from "react";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
+import {getDateFromDateTimeString} from "../utils/DateTimeUtils";
 
 export interface IPayment {
     id: number;
@@ -19,12 +20,15 @@ interface IPaymentProps {
     isEditable: boolean;
 }
 
-function Payment(props: IPaymentProps) {
-    const [isDisabled, setIsDisabled] = useState(true);
-    const [isEditButtonDisabled, setIsEditButtonDisabled] = useState(false);
-    const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
 
+
+function Payment(props: IPaymentProps) {
     let [payment, isEditable] = [props.payment, props.isEditable];
+    const [date, setDate] = useState(getDateFromDateTimeString(payment.date));
+    const [isDisabled, setIsDisabled] = useState(isEditable);
+    const [isEditButtonDisabled, setIsEditButtonDisabled] = useState(false);
+    const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(isEditable);
+
 
     function onSaveWhenEditable() {
         axios.put('http://localhost:8080/payments/' + payment.id, {
@@ -85,50 +89,86 @@ function Payment(props: IPaymentProps) {
 
     return (
         <>
-            <InputGroup className="mb-2">
-                <InputGroup.Text id="basic-addon3">
-                    Category
-                </InputGroup.Text>
-                <Form.Control id={payment.id.toString()} aria-describedby="basic-addon3"
-                              placeholder={payment.category.toString()} disabled={isDisabled}/>
-            </InputGroup>
-            <InputGroup className="mb-2">
-                <InputGroup.Text id="basic-addon3">
-                    Date
-                </InputGroup.Text>
-                <Form.Control id={payment.id.toString()} aria-describedby="basic-addon3"
-                              placeholder={payment.date.toString()} disabled={isDisabled}/>
-            </InputGroup>
-            <InputGroup className="mb-2">
-                <InputGroup.Text id="basic-addon3">
-                    Amount
-                </InputGroup.Text>
-                <Form.Control aria-label="Amount (to the nearest dollar)" disabled={isDisabled}
-                              placeholder={Math.abs(payment.amount).toString()}/>
-                <InputGroup.Text>PLN</InputGroup.Text>
-                <InputGroup.Text>.00</InputGroup.Text>
+            <Form>
+                <Row>
+                    <Col>
+                        <InputGroup className="mb-2">
+                            <InputGroup.Text id="basic-addon3">
+                                Name
+                            </InputGroup.Text>
+                            <Form.Control id={payment.id.toString()} aria-describedby="basic-addon3"
+                                          placeholder={payment.name.toString()} disabled={isDisabled}/>
+                        </InputGroup>
+                    </Col>
+                    <Col>
+                        <InputGroup className="mb-2">
+                            <InputGroup.Text id="basic-addon3">
+                                Category
+                            </InputGroup.Text>
+                            <Form.Control id={payment.id.toString()} aria-describedby="basic-addon3"
+                                          placeholder={payment.category.toString()} disabled={isDisabled}/>
+                        </InputGroup>
+                    </Col>
+                    <Col>
+                        <InputGroup className="mb-2">
+                            <InputGroup.Text id="basic-addon3">
+                                Date
+                            </InputGroup.Text>
+                            <Form.Control
+                                type="date"
+                                id={payment.id.toString()}
+                                aria-describedby="basic-addon3"
+                                value={date}  // Set the initial value or default date
+                                onChange={(e) => {setDate(e.target.value)}}
+                                disabled={isDisabled}
+                            />
+                        </InputGroup>
+                    </Col>
 
-                <InputGroup.Text>Type of payment</InputGroup.Text>
-                <Form.Select aria-label="Default select example" disabled={isDisabled}>
-                    <option>Income</option>
-                    <option>Expense</option>
-                </Form.Select>
-            </InputGroup>
-            <InputGroup className="mb-2">
-            </InputGroup>
-            <InputGroup className="mb-2">
-                <InputGroup.Text>Description</InputGroup.Text>
-                <Form.Control as="textarea" aria-label="With textarea" placeholder={payment.description.toString()}
-                              disabled={isDisabled}/>
-            </InputGroup>
-            <Stack id="buttons-stack" direction="horizontal" className="centered-stack">
-                <Button variant="danger" className="button" onClick={onDelete}>Delete</Button>
-                <Button variant="success" className="button" onClick={onSaveWhenNotEditable} disabled={isSaveButtonDisabled}>Save</Button>
-            </Stack>
-
-
+                </Row>
+                <Row>
+                    <Col>
+                        <InputGroup className="mb-2">
+                            <InputGroup.Text id="basic-addon3">
+                                Amount
+                            </InputGroup.Text>
+                            <Form.Control aria-label="Amount (to the nearest dollar)" disabled={isDisabled}
+                                          placeholder={Math.abs(payment.amount).toString()}/>
+                            <InputGroup.Text>PLN</InputGroup.Text>
+                            <InputGroup.Text>.00</InputGroup.Text>
+                        </InputGroup>
+                    </Col>
+                    <Col>
+                        <InputGroup className="mb-2">
+                            <InputGroup.Text>Type of payment</InputGroup.Text>
+                            <Form.Select aria-label="Default select example" disabled={isDisabled}>
+                                <option>Income</option>
+                                <option>Expense</option>
+                            </Form.Select>
+                        </InputGroup>
+                    </Col>
+                </Row>
+                <Row>
+                    <InputGroup className="mb-2">
+                        <InputGroup.Text>Description</InputGroup.Text>
+                        <Form.Control as="textarea" aria-label="With textarea" placeholder={payment.description.toString()}
+                                      disabled={isDisabled}/>
+                    </InputGroup>
+                </Row>
+                <Stack id="buttons-stack" direction="horizontal" className="centered-stack">
+                    {
+                        isEditable && <Button variant="primary" className="button" onClick={onEdit}
+                                              disabled={isEditButtonDisabled}>Edit</Button>
+                    }
+                    <Button variant="danger" className="button" onClick={onDelete}>Delete</Button>
+                    <Button variant="success" className="button"
+                            onClick={isEditable ? onSaveWhenEditable : onSaveWhenNotEditable}
+                            disabled={isSaveButtonDisabled}>Save</Button>
+                </Stack>
+            </Form>
         </>
-    );
+    )
+        ;
 }
 
 export default Payment;

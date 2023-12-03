@@ -32,12 +32,12 @@ function Header() {
                     </Offcanvas.Header>
                     <Offcanvas.Body>
                         <Nav className="justify-content-end flex-grow-1 pe-3">
-                            <Nav.Link>
+                            <Navbar.Text>
                                 <Link to={"/home"} className="navbar-link">Home</Link>
-                            </Nav.Link>
-                            <Nav.Link>
+                            </Navbar.Text>
+                            <Navbar.Text>
                                 <Link to={"/payments"} className="navbar-link">Payments</Link>
-                            </Nav.Link>
+                            </Navbar.Text>
                             <NavDropdown
                                 title="Charts"
                                 id={`offcanvasNavbarDropdown-expand-${expand}`}

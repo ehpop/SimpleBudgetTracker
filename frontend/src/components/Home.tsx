@@ -1,6 +1,6 @@
 import Payment, {IPayment} from "./Payment";
 
-
+import '../styles/Home.css';
 
 function Home() {
     const payment: IPayment = {
@@ -15,9 +15,11 @@ function Home() {
     }
 
     return (
-        <div>
+        <div className="main-div">
             <h1>Add payment</h1>
-            <Payment payment={payment} isEditable={true}/>
+            <div className="payment-div">
+                <Payment payment={payment} isEditable={false}/>
+            </div>
         </div>
     );
 }
