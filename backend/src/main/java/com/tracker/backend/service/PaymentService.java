@@ -2,8 +2,11 @@ package com.tracker.backend.service;
 
 import com.tracker.backend.dto.PaymentDTO;
 import com.tracker.backend.mapper.PaymentMapper;
+import com.tracker.backend.model.Payment;
 import com.tracker.backend.repository.PaymentRepository;
 import java.util.Collection;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,12 +40,14 @@ public class PaymentService {
     return payment.map(paymentMapper::paymentToPaymentDTO).orElseThrow();
   }
 
-  public void update(Integer id, PaymentDTO paymentDTO) {
+  public PaymentDTO update(Integer id, PaymentDTO paymentDTO) {
     log.info("Updating payment with id {}: {}", id, paymentDTO);
     var paymentToUpdate = paymentRepository.findById(id).orElseThrow();
     paymentToUpdate.updatePayment(paymentMapper.paymentDTOToPayment(paymentDTO));
-    paymentRepository.save(paymentToUpdate);
+    paymentToUpdate.setId(id);
+    var result = paymentRepository.save(paymentToUpdate);
     log.info("Payment with id {} updated", id);
+    return paymentMapper.paymentToPaymentDTO(result);
   }
 
   public void delete(Integer id) {
@@ -55,5 +60,24 @@ public class PaymentService {
     log.info("Deleting all payments");
     paymentRepository.deleteAll();
     log.info("All payments deleted");
+  }
+
+  public Collection<PaymentDTO> getAllByUserId(String userId) {
+    log.info("Getting all payments by user id {}", userId);
+    var userIds = paymentRepository.findAll().stream()
+        .map(Payment::getUserId)
+        .collect(Collectors.toSet());
+
+    if (!userIds.contains(userId)) {
+      log.info("User with id {} not found", userId);
+      throw new NoSuchElementException("User with id " + userId + " not found");
+    }
+
+    var result = paymentRepository.findAll().stream()
+        .filter(payment -> payment.getUserId().equals(userId))
+        .map(paymentMapper::paymentToPaymentDTO)
+        .toList();
+    log.info("All payments by user id {}: {}", userId, result);
+    return result;
   }
 }
