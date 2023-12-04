@@ -6,10 +6,6 @@ import axios from "axios";
 import "../styles/Charts.css"
 import PieChart from "./PieChart";
 
-interface IChartsProps {
-    payments: Array<IPayment> | undefined;
-}
-
 function Charts() {
     const [payments, setPayments] = useState<Array<IPayment>>([]);
 

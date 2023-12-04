@@ -9,6 +9,7 @@ function Home() {
         description: "Monthly rent payment.",
         amount: 1000.0,
         date: new Date().toISOString(),
+        type: "Expense",
         userId: "1",
         category: "Living expenses"
     }

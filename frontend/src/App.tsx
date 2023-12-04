@@ -7,6 +7,7 @@ import {Route, Routes} from "react-router-dom";
 import Home from './components/Home';
 import Payments from './components/Payments';
 import Charts from './components/Charts';
+import MockDataButton from "./utils/MockDataButton";
 
 
 function App() {
