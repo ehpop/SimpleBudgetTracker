@@ -40,12 +40,14 @@ public class PaymentService {
     return payment.map(paymentMapper::paymentToPaymentDTO).orElseThrow();
   }
 
-  public void update(Integer id, PaymentDTO paymentDTO) {
+  public PaymentDTO update(Integer id, PaymentDTO paymentDTO) {
     log.info("Updating payment with id {}: {}", id, paymentDTO);
     var paymentToUpdate = paymentRepository.findById(id).orElseThrow();
     paymentToUpdate.updatePayment(paymentMapper.paymentDTOToPayment(paymentDTO));
-    paymentRepository.save(paymentToUpdate);
+    paymentToUpdate.setId(id);
+    var result = paymentRepository.save(paymentToUpdate);
     log.info("Payment with id {} updated", id);
+    return paymentMapper.paymentToPaymentDTO(result);
   }
 
   public void delete(Integer id) {
