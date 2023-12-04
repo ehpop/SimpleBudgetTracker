@@ -36,6 +36,7 @@ function Payment(props: IPaymentProps) {
 
     function onSaveWhenEditable() {
         const editedPayment = {
+            id: payment.id,
             name: formData.name,
             description: payment.description,
             amount: formData.amount,
@@ -44,9 +45,10 @@ function Payment(props: IPaymentProps) {
             userId: payment.userId,
             category: formData.category
         }
-        axios.put('http://localhost:8080/payments/' + payment.id, {
+        console.log();
+        axios.put('http://localhost:8080/payments/' + payment.id,
             editedPayment
-        }).then(function (response) {
+        ).then(function (response) {
             //TODO: create pop up with confirmation
             setIsDisabled(true);
             setIsEditButtonDisabled(false);
@@ -69,7 +71,6 @@ function Payment(props: IPaymentProps) {
             userId: payment.userId,
             category: formData.category
         }
-
         console.log(newPayment);
         axios.post('http://localhost:8080/payments', newPayment)
             .then(function (response) {
@@ -92,9 +93,7 @@ function Payment(props: IPaymentProps) {
     function onDelete() {
         axios.delete('http://localhost:8080/payments/' + payment.id)
             .then(function (response) {
-                console.log('Before: ' + payments);
                 setPayments([...payments.filter((p: IPayment) => p.id !== payment.id)]);
-                console.log('After: ' + payments);
                 return response;
             })
             .catch(function (error) {
