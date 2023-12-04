@@ -8,7 +8,9 @@ import Home from './components/Home';
 import Payments from './components/Payments';
 import Charts from './components/Charts';
 
+
 function App() {
+
     return (
         <div className="App">
             <Header/>
