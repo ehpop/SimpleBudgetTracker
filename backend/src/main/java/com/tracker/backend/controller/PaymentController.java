@@ -106,9 +106,9 @@ public class PaymentController {
           @ApiResponse(responseCode = "404", description = "Payment not found"),
       })
   @PutMapping("/{id}")
-  @JsonView(Views.Put.class)
+  @JsonView(Views.Get.class)
   public ResponseEntity<PaymentDTO> update(@PathVariable Integer id,
-      @RequestBody PaymentDTO payment) {
+      @RequestBody @JsonView({Views.Put.class}) PaymentDTO payment) {
     log.debug("Updating payment with id {}: {}", id, payment);
     try {
       paymentService.update(id, payment);
@@ -152,5 +152,25 @@ public class PaymentController {
     paymentService.deleteAll();
     log.debug("All payments deleted");
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  @Operation(description = "Returns all payments by user id", tags = {"Payments", "Get"})
+  @ApiResponses(
+      value = {
+          @ApiResponse(responseCode = "200", description = "Successfully retrieved payments", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PaymentDTO.class)))),
+          @ApiResponse(responseCode = "404", description = "User not found")
+      })
+  @GetMapping("/user/{userId}")
+  @JsonView(Views.Get.class)
+  public ResponseEntity<List<PaymentDTO>> getAllByUserId(@PathVariable String userId) {
+    log.debug("Getting all payments by user id {}", userId);
+    try {
+      var payments = new ArrayList<>(paymentService.getAllByUserId(userId));
+      log.debug("All payments by user id {}: {}", userId, payments);
+      return new ResponseEntity<>(payments, HttpStatus.OK);
+    } catch (NoSuchElementException e) {
+      log.debug("User with id {} not found", userId);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
   }
 }

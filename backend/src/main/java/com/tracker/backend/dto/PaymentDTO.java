@@ -39,4 +39,7 @@ public class PaymentDTO {
   @JsonView({Views.Post.class, Views.Put.class, Views.Get.class})
   String category;
 
+  @Schema(description = "Type of the payment. Valid values are: Expense, Income", example = "Expense")
+  @JsonView({Views.Post.class, Views.Put.class, Views.Get.class})
+  String type;
 }

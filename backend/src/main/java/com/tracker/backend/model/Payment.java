@@ -62,11 +62,17 @@ public class Payment {
   @NotNull
   private String category;
 
+  @Column(nullable = false)
+  @NotEmpty
+  @NotNull
+  private String type;
+
   public void updatePayment(Payment payment) {
     this.name = payment.getName();
     this.description = payment.getDescription();
     this.amount = payment.getAmount();
     this.date = payment.getDate();
     this.category = payment.getCategory();
+    this.type = payment.getType();
   }
 }
