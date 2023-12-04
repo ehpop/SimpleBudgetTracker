@@ -111,9 +111,9 @@ public class PaymentController {
       @RequestBody @JsonView({Views.Put.class}) PaymentDTO payment) {
     log.debug("Updating payment with id {}: {}", id, payment);
     try {
-      paymentService.update(id, payment);
+      var result = paymentService.update(id, payment);
       log.debug("Payment with id {} updated", id);
-      return new ResponseEntity<>(payment, HttpStatus.OK);
+      return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (NoSuchElementException e) {
       log.debug("Payment with id {} not found, cannot update", id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
