@@ -1,0 +1,22 @@
+.navbar-link {
+    font-size: 1rem;
+    color: rgba(20, 20, 20, 0.32);
+    text-decoration: none;
+    margin: 0 0.5rem;
+    transition: all 0.2s ease-in;
+    &:hover {
+        font-size: 1.05rem;
+        color: #000000;
+    }
+}
+
+#brand-element {
+    font-size: 1.5rem;
+    color: #000000;
+    text-decoration: none;
+    margin: 0 0.1rem;
+    transition: all 0.2s ease-in;
+    &:hover {
+        color: #000000;
+    }
+}
