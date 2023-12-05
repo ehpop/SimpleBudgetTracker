@@ -20,17 +20,34 @@ function Charts() {
             });
     }, []);
 
+    function charts() {
+        return (
+            <div className="charts-div">
+                <div className="bar-charts">
+                    <h2 className="chart-category">Rate of spending</h2>
+                    <div className="vertical"/>
+                    <BarChart payments={payments} typeOfPayment="expense"/>
+                    <div className="vertical"/>
+                    <BarChart payments={payments} typeOfPayment="income"/>
+                </div>
+                <hr/>
+                <div className="pie-charts">
+                    <h2 className="chart-category">Categories of spending</h2>
+                    <div className="vertical"/>
+                    <PieChart payments={payments} typeOfPayment="expense"/>
+                    <div className="vertical"/>
+                    <PieChart payments={payments} typeOfPayment="income"/>
+                </div>
+            </div>);
+    }
+
     return (
         <div className="main-charts-div">
             <h1>Charts</h1>
             {
                 payments.length == 0
                     ? <h1>No payments added yet</h1>
-                    : <div className="charts-div">
-                        <BarChart payments={payments}/>
-                        <hr/>
-                        <PieChart payments={payments}/>
-                    </div>
+                    : charts()
             }
         </div>
     );
