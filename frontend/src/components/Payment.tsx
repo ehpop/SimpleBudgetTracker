@@ -1,13 +1,11 @@
 import "../styles/Payment.css"
 import {Col, Form, InputGroup, Row, Stack} from "react-bootstrap";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
-import {
-    getDateFromDateTimeString,
-    getDateTimeStringFromDate,
-    getDateTimeStringFromDateAndTime
-} from "../utils/DateTimeUtils";
+import {getDateFromDateTimeString, getDateTimeStringFromDateAndTime} from "../utils/DateTimeUtils";
+import {PaymentsContext} from "./Payments";
+
 
 export interface IPayment {
     id: number;
@@ -15,6 +13,7 @@ export interface IPayment {
     date: string;
     category: string;
     description: string;
+    type: string;
     userId: string;
     amount: number;
 }
@@ -31,41 +30,53 @@ function Payment(props: IPaymentProps) {
     const [isDisabled, setIsDisabled] = useState(isEditable);
     const [isEditButtonDisabled, setIsEditButtonDisabled] = useState(false);
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(isEditable);
+    const {payments, setPayments} = useContext(PaymentsContext);
 
     let [formData, setFormData] = useState<IPayment>({...payment});
 
     function onSaveWhenEditable() {
-        axios.put('http://localhost:8080/payments/' + payment.id, {
-            "id": payment.id,
-            "name": payment.name,
-            "description": payment.description,
-            "amount": payment.amount,
-            "date": payment.date,
-            "userId": payment.userId,
-            "category": payment.category
-        }).then(function (response) {
+        const editedPayment = {
+            id: payment.id,
+            name: formData.name,
+            description: payment.description,
+            amount: formData.amount,
+            date: getDateTimeStringFromDateAndTime(date, new Date().toLocaleTimeString()),
+            type: formData.type.toLowerCase(),
+            userId: payment.userId,
+            category: formData.category
+        }
+        console.log();
+        axios.put('http://localhost:8080/payments/' + payment.id,
+            editedPayment
+        ).then(function (response) {
             //TODO: create pop up with confirmation
             setIsDisabled(true);
             setIsEditButtonDisabled(false);
             setIsSaveButtonDisabled(true);
+            setPayments([...payments.filter((p: IPayment) => p.id !== payment.id), editedPayment]);
         }).catch(function (error) {
+            console.log(editedPayment)
             //TODO: create pop up with error
             console.log(error);
         });
     }
 
     function onSaveWhenNotEditable() {
-        axios.post('http://localhost:8080/payments', {
-            "name": formData.name,
-            "description": formData.description,
-            "amount": formData.amount,
-            "date": getDateTimeStringFromDate(formData.date),
-            "userId": formData.userId,
-            "category": formData.category
-        }).then(function (response) {
-            //TODO: create pop up with confirmation
-            console.log(response);
-        }).catch(function (error) {
+        const newPayment = {
+            name: formData.name,
+            description: payment.description,
+            amount: formData.amount,
+            date: getDateTimeStringFromDateAndTime(date, new Date().toLocaleTimeString()),
+            type: formData.type.toLowerCase(),
+            userId: payment.userId,
+            category: formData.category
+        }
+        console.log(newPayment);
+        axios.post('http://localhost:8080/payments', newPayment)
+            .then(function (response) {
+                //TODO: create pop up with confirmation
+                console.log(response);
+            }).catch(function (error) {
             //TODO: create pop up with error
             console.log(error);
         });
@@ -82,7 +93,7 @@ function Payment(props: IPaymentProps) {
     function onDelete() {
         axios.delete('http://localhost:8080/payments/' + payment.id)
             .then(function (response) {
-                //TODO: create pop up with confirmation
+                setPayments([...payments.filter((p: IPayment) => p.id !== payment.id)]);
                 return response;
             })
             .catch(function (error) {
@@ -134,7 +145,7 @@ function Payment(props: IPaymentProps) {
                                 type="date"
                                 id={payment.id.toString()}
                                 aria-describedby="basic-addon3"
-                                value={date}  // Set the initial value or default date
+                                value={date}
                                 onChange={(e) => {
                                     setDate(e.target.value);
                                     setFormData({...formData, date: e.target.value});
@@ -167,9 +178,20 @@ function Payment(props: IPaymentProps) {
                     <Col>
                         <InputGroup className="mb-2">
                             <InputGroup.Text>Type of payment</InputGroup.Text>
-                            <Form.Select aria-label="Default select example" disabled={isDisabled}>
-                                <option>Income</option>
-                                <option>Expense</option>
+                            <Form.Select
+                                aria-label="Default select example"
+                                disabled={isDisabled}
+                                onChange={(e) => {
+                                    setFormData({...formData, type: e.target.value.toLowerCase()})
+                                }}
+                                defaultValue={payment?.type.toLowerCase() === 'expense' ? 'Expense' : 'Income'}
+                            >
+                                <option value="Expense">
+                                    Expense
+                                </option>
+                                <option value="Income">
+                                    Income
+                                </option>
                             </Form.Select>
                         </InputGroup>
                     </Col>
@@ -186,8 +208,12 @@ function Payment(props: IPaymentProps) {
                     {
                         isEditable && <Button variant="primary" className="button" onClick={onEdit}
                                               disabled={isEditButtonDisabled}>Edit</Button>
+
                     }
-                    <Button variant="danger" className="button" onClick={onDelete}>Delete</Button>
+                    {
+                        isEditable && <Button variant="danger" className="button" onClick={onDelete}>Delete</Button>
+                    }
+
                     <Button variant="success" className="button"
                             onClick={isEditable ? onSaveWhenEditable : onSaveWhenNotEditable}
                             disabled={isSaveButtonDisabled}>Save</Button>

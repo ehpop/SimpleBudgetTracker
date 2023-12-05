@@ -1,18 +1,19 @@
 import {Accordion, Stack} from "react-bootstrap";
 import Payment, {IPayment} from "./Payment";
-import Button from "react-bootstrap/Button";
 import axios from "axios";
 
 import "../styles/Payments.css"
-import {useEffect, useState} from "react";
+import {createContext, useEffect, useState} from "react";
+
+export const PaymentsContext = createContext<any>([]);
 
 function Payments() {
     const [payments, setPayments] = useState<Array<IPayment>>([]);
 
+
     useEffect(() => {
-        axios.get('http://localhost:8080/payments')
+        axios.get('http://localhost:8080/payments/user/1')
             .then(function (response) {
-                console.log(response);
                 setPayments(response.data);
             })
             .catch(function (error) {
@@ -21,15 +22,21 @@ function Payments() {
 
     }, []);
 
+    useEffect(() => {
+        setPayments(payments)
+    }, [payments]);
+
     return (
-        <Accordion>
-            {payments.length == 0
-                ? <h1>No payments</h1>
-                : payments.map((payment, index) => {
-                    return <PaymentAcordBody id={index + 1} payment={payment}/>
-                })
-            }
-        </Accordion>
+        <PaymentsContext.Provider value={{payments, setPayments}}>
+            <Accordion>
+                {payments.length == 0
+                    ? <h1>No payments</h1>
+                    : payments.map((payment, index) => {
+                        return <PaymentAcordBody id={index + 1} key={index+1} payment={payment}/>
+                    })
+                }
+            </Accordion>
+        </PaymentsContext.Provider>
     );
 }
 

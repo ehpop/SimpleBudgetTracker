@@ -23,7 +23,7 @@ export function getTimeFromDateTimeString(dateTimeString: string): string {
 }
 
 export function getDateTimeStringFromDateAndTime(date: string, time: string): string {
-    return `${date}T${time}:00.000Z`;
+    return `${date}T${time}.000Z`;
 }
 
 export function getDateTimeStringFromDate(date: string): string {

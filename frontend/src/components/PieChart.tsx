@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Bar, Pie} from 'react-chartjs-2';
-import {Chart as ChartJS} from 'chart.js/auto'
-import {CategoryScale, LinearScale} from "chart.js";
+import {Pie} from 'react-chartjs-2';
 
 import "../styles/PieChart.css"
 import {IPayment} from "./Payment";
@@ -14,7 +12,7 @@ interface ICategorySums {
     [category: string]: number;
 }
 
-function categoriseData(payments: Array<IPayment>):  ICategorySums{
+function categoriseData(payments: Array<IPayment>): ICategorySums {
     return payments.reduce<ICategorySums>((accumulator, item) => {
         const {category, amount} = item;
         accumulator[category] = (accumulator[category] || 0) + amount;

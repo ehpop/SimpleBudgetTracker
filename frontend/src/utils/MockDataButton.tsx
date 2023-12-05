@@ -6,6 +6,7 @@ const data = [
         "date": "2023-01-01T00:00Z",
         "category": "Living expenses",
         "description": "Monthly rent payment.",
+        "type": "expense",
         "userId": "1",
         "amount": 1000
     },
@@ -14,6 +15,7 @@ const data = [
         "date": "2023-01-02T00:00Z",
         "category": "Food",
         "description": "Grocery shopping",
+        "type": "expense",
         "userId": "1",
         "amount": 150
     },
@@ -22,6 +24,7 @@ const data = [
         "date": "2023-01-03T00:00Z",
         "category": "Utilities",
         "description": "Monthly internet bill",
+        "type": "expense",
         "userId": "1",
         "amount": 50
     },
@@ -30,6 +33,7 @@ const data = [
         "date": "2023-01-04T00:00Z",
         "category": "Income",
         "description": "Monthly salary",
+        "type": "income",
         "userId": "1",
         "amount": 3000
     },
@@ -38,6 +42,7 @@ const data = [
         "date": "2023-01-05T00:00Z",
         "category": "Food",
         "description": "Dinner at a restaurant",
+        "type": "expense",
         "userId": "1",
         "amount": 80
     },
@@ -46,6 +51,7 @@ const data = [
         "date": "2023-01-06T00:00Z",
         "category": "Health",
         "description": "Monthly gym membership",
+        "type": "expense",
         "userId": "1",
         "amount": 60
     },
@@ -54,6 +60,7 @@ const data = [
         "date": "2023-01-07T00:00Z",
         "category": "Travel",
         "description": "Public transportation fare",
+        "type": "expense",
         "userId": "1",
         "amount": 30
     },
@@ -62,6 +69,7 @@ const data = [
         "date": "2023-01-08T00:00Z",
         "category": "Utilities",
         "description": "Monthly phone bill",
+        "type": "expense",
         "userId": "1",
         "amount": 40
     },
@@ -70,6 +78,7 @@ const data = [
         "date": "2023-01-09T00:00Z",
         "category": "Entertainment",
         "description": "Movie night with friends",
+        "type": "expense",
         "userId": "1",
         "amount": 25
     },
@@ -78,6 +87,7 @@ const data = [
         "date": "2023-01-10T00:00Z",
         "category": "Savings",
         "description": "Monthly savings contribution",
+        "type": "income",
         "userId": "1",
         "amount": 500
     }
@@ -90,6 +100,7 @@ function postData() {
             "description": data[i].description,
             "amount": data[i].amount,
             "date": data[i].date,
+            "type": data[i].type,
             "userId": data[i].userId,
             "category": data[i].category
         }).then(function (response) {
