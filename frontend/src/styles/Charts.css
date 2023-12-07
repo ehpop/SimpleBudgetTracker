@@ -7,7 +7,47 @@
     background-color: #cccccc;
 }
 
+.bar-charts {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 50vh;
+}
+
+.pie-charts {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 50vh;
+}
+
 hr {
     width: 90%;
     margin: 0.5rem 0;
+    color: #808080FF;
+}
+
+.vertical {
+    border-left: 1px solid #808080FF;
+    height: 100%;
+    left: 50%;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.chart-category {
+    font-size: 1.5rem;
+    color: #000000;
+    text-decoration: none;
+    margin: 0 0.1rem;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    transition: all 0.2s ease-in;
+    &:hover {
+        color: #000000;
+    }
 }
