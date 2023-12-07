@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import axios from "axios";
 import {getDateFromDateTimeString, getDateTimeStringFromDateAndTime} from "../utils/DateTimeUtils";
 import {PaymentsContext} from "./Payments";
-
+import ControlledPopup from "./ControlledPopup";
 
 export interface IPayment {
     id: number;
@@ -23,13 +23,20 @@ interface IPaymentProps {
     isEditable: boolean;
 }
 
-
 function Payment(props: IPaymentProps) {
     let [payment, isEditable] = [props.payment, props.isEditable];
     const [date, setDate] = useState(getDateFromDateTimeString(payment.date));
     const [isDisabled, setIsDisabled] = useState(isEditable);
     const [isEditButtonDisabled, setIsEditButtonDisabled] = useState(false);
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(isEditable);
+
+    const [cancelPopupOpen, setCancelPopupOpen] = useState(false);
+    const [addedSuccessfullyPopupOpen, setAddedSuccessfullyPopupOpen] = useState(false);
+    const [editedSuccessfullyPopupOpen, setEditedSuccessfullyPopupOpen] = useState(false);
+    const [deletedSuccessfullyPopupOpen, setDeletedSuccessfullyPopupOpen] = useState(false);
+    const [errorPopupOpen, setErrorPopupOpen] = useState(false);
+    const [errorPopupMsg, setErrorPopupMsg] = useState("");
+
     const {payments, setPayments} = useContext(PaymentsContext);
 
     let [formData, setFormData] = useState<IPayment>({...payment});
@@ -45,20 +52,20 @@ function Payment(props: IPaymentProps) {
             userId: payment.userId,
             category: formData.category
         }
-        console.log();
         axios.put('http://localhost:8080/payments/' + payment.id,
             editedPayment
-        ).then(function (response) {
-            //TODO: create pop up with confirmation
-            setIsDisabled(true);
-            setIsEditButtonDisabled(false);
-            setIsSaveButtonDisabled(true);
-            setPayments([...payments.filter((p: IPayment) => p.id !== payment.id), editedPayment]);
-        }).catch(function (error) {
-            console.log(editedPayment)
-            //TODO: create pop up with error
-            console.log(error);
-        });
+        )
+            .then(function (response) {
+                setIsDisabled(true);
+                setIsEditButtonDisabled(false);
+                setIsSaveButtonDisabled(true);
+                setPayments([...payments.filter((p: IPayment) => p.id !== payment.id), editedPayment]);
+                setEditedSuccessfullyPopupOpen(true);
+            })
+            .catch(function (error) {
+                setErrorPopupOpen(true);
+                console.log(error);
+            });
     }
 
     function onSaveWhenNotEditable() {
@@ -71,15 +78,15 @@ function Payment(props: IPaymentProps) {
             userId: payment.userId,
             category: formData.category
         }
-        console.log(newPayment);
         axios.post('http://localhost:8080/payments', newPayment)
             .then(function (response) {
-                //TODO: create pop up with confirmation
+                setAddedSuccessfullyPopupOpen(true);
                 console.log(response);
-            }).catch(function (error) {
-            //TODO: create pop up with error
-            console.log(error);
-        });
+            })
+            .catch(function (error) {
+                setErrorPopupOpen(true);
+                console.log(error);
+            });
     }
 
     function onEdit() {
@@ -91,15 +98,41 @@ function Payment(props: IPaymentProps) {
     }
 
     function onDelete() {
-        axios.delete('http://localhost:8080/payments/' + payment.id)
-            .then(function (response) {
-                setPayments([...payments.filter((p: IPayment) => p.id !== payment.id)]);
-                return response;
-            })
-            .catch(function (error) {
-                //TODO: create pop up with error
-                console.log(error);
-            });
+        setCancelPopupOpen(true);
+    }
+
+    function ConfirmDeletePopup({isOpen, setIsOpen}: IPopupProps) {
+        function deletePayment() {
+            axios.delete('http://localhost:8080/payments/' + payment.id)
+                .then(function (response) {
+                    setPayments([...payments.filter((p: IPayment) => p.id !== payment.id)]);
+                    setDeletedSuccessfullyPopupOpen(true);
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    setErrorPopupOpen(true);
+                    console.log(error);
+                });
+        }
+
+        const buttons = [
+            <Button className="alert-success" onClick={() => {
+                setIsOpen && setIsOpen(false);
+                deletePayment();
+            }
+            }>Yes</Button>,
+            <Button className="alert-danger" onClick={
+                () => setIsOpen && setIsOpen(false)
+            }>No</Button>
+        ]
+
+        return (<>
+            <ControlledPopup onExternalToggle={setIsOpen} externalOpen={isOpen} title="Confirm operation"
+                             popupButtons={buttons}
+                             content={
+                                 <p>Are you sure you want to delete this payment?</p>
+                             }/>
+        </>);
     }
 
     return (
@@ -219,9 +252,86 @@ function Payment(props: IPaymentProps) {
                             disabled={isSaveButtonDisabled}>Save</Button>
                 </Stack>
             </Form>
+            <ConfirmDeletePopup isOpen={cancelPopupOpen} setIsOpen={setCancelPopupOpen}/>
+            <SuccessfullyAddedPopup isOpen={addedSuccessfullyPopupOpen} setIsOpen={setAddedSuccessfullyPopupOpen}/>
+            <EditedSuccessfullyPopup isOpen={editedSuccessfullyPopupOpen} setIsOpen={setEditedSuccessfullyPopupOpen}/>
+            <DeletedSuccessfullyPopup isOpen={deletedSuccessfullyPopupOpen}
+                                      setIsOpen={setDeletedSuccessfullyPopupOpen}/>
+            <ErrorPopUp isOpen={errorPopupOpen} setIsOpen={setErrorPopupOpen}
+                        msg={errorPopupMsg}/>
         </>
     )
         ;
+}
+
+interface IPopupProps {
+    isOpen: boolean;
+    setIsOpen?: (isOpen: boolean) => void;
+    msg?: string;
+}
+
+function SuccessfullyAddedPopup({isOpen, setIsOpen}: IPopupProps) {
+    const buttons = [
+        <Button className="alert-success" onClick={
+            () => setIsOpen && setIsOpen(false)
+        }>Ok</Button>
+    ]
+
+    return (<>
+        <ControlledPopup onExternalToggle={setIsOpen} externalOpen={isOpen} title="Successfully added payment"
+                         popupButtons={buttons}
+                         content={
+                             <p>Payment added successfully!</p>
+                         }/>
+    </>);
+}
+
+function ErrorPopUp({isOpen, setIsOpen, msg: errorMsg}: IPopupProps) {
+    const buttons = [
+        <Button className="alert-success" onClick={() => setIsOpen && setIsOpen(false)}>Ok</Button>
+    ]
+
+    return (<>
+        <ControlledPopup onExternalToggle={setIsOpen} externalOpen={isOpen} title="Error" popupButtons={buttons}
+                         content={
+                             <div>
+                                 <p>There was an error</p>
+                                 {errorMsg && <p>Error Message: {errorMsg}</p>}
+                             </div>
+                         }/>
+    </>);
+}
+
+function EditedSuccessfullyPopup({isOpen, setIsOpen}: IPopupProps) {
+    const buttons = [
+        <Button className="alert-success" onClick={
+            () => setIsOpen && setIsOpen(false)
+        }>Ok</Button>
+    ]
+
+    return (<>
+        <ControlledPopup onExternalToggle={setIsOpen} externalOpen={isOpen} title="Successfully edited payment"
+                         popupButtons={buttons}
+                         content={
+                             <p>Payment edited successfully!</p>
+                         }/>
+    </>);
+}
+
+function DeletedSuccessfullyPopup({isOpen, setIsOpen}: IPopupProps) {
+    const buttons = [
+        <Button className="alert-success" onClick={
+            () => setIsOpen && setIsOpen(false)
+        }>Ok</Button>
+    ]
+
+    return (<>
+        <ControlledPopup onExternalToggle={setIsOpen} externalOpen={isOpen} title="Successfully deleted payment"
+                         popupButtons={buttons}
+                         content={
+                             <p>Payment deleted successfully!</p>
+                         }/>
+    </>);
 }
 
 export default Payment;
