@@ -1,4 +1,4 @@
-package com.tracker.backend.configuration.security;
+package com.tracker.backend.security;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 @Configuration
 public class JwtConfig {
 
-  @Value("${spring.security.ouath2.resourceserver.jwt.jwk-set-uri}")
+  @Value("${spring.config.activate.on-profile}")
   private String jwkSetUri;
 
   /**

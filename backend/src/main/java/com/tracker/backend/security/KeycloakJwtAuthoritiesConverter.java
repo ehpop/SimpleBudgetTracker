@@ -1,4 +1,4 @@
-package com.tracker.backend.configuration.security;
+package com.tracker.backend.security;
 
 import java.util.Collection;
 import java.util.Map;

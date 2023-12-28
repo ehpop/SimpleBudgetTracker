@@ -1,4 +1,4 @@
-package com.tracker.backend.configuration.security;
+package com.tracker.backend.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
