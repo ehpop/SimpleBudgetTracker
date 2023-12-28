@@ -1,4 +1,4 @@
-package com.tracker.backend.configuration;
+package com.tracker.backend.configuration.security;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;

@@ -3,10 +3,14 @@ logging:
     com.tracker.backend: INFO
 
 # Cors configuration
-
 backend:
   cors:
     allowed-origins: http://localhost:3000
+  jwt:
+    keycloak: http://localhost:8443
+    realm: app
+    issuer-uri: ${app.jwt.keycloak}/realms/${app.jwt.realm}
+    resource-client-id: frontend-web
 
 # Open API documentation available at http://localhost:8080/budget-tracker-api-ui.html
 springdoc:
@@ -18,8 +22,16 @@ springdoc:
     tags-sorter: alpha
 
 
-# Database configuration
+# Spring configuration
 spring:
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${app.jwt.issuer-uri}
+          jwk-set-uri: ${app.jwt.issuer-uri}/protocol/openid-connect/certs
+  #          public-key-location: classpath:keycloak-key.pub
+
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -31,4 +43,8 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
+
+app:
+    jwt:
+        issuer-uri: http://keycloak:8443
 
