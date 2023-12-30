@@ -4,23 +4,28 @@ import axios from "axios";
 
 import "../styles/Payments.css"
 import {createContext, useEffect, useState} from "react";
+import {paymentsApi} from "../service/paymentService";
+import {useAuth} from "react-oidc-context";
 
 export const PaymentsContext = createContext<any>([]);
 
 function Payments() {
     const [payments, setPayments] = useState<Array<IPayment>>([]);
-
+    const auth = useAuth();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/payments/user/1')
-            .then(function (response) {
-                setPayments(response.data);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        if (auth.user?.profile?.sid) {
+            paymentsApi.getPaymentsByUserId(auth.user?.profile?.sid, auth.user?.access_token)
+                .then((response) => {
+                    console.log(response);
+                    setPayments(response);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
 
-    }, []);
+    }, [auth.user]);
 
     useEffect(() => {
         setPayments(payments)
@@ -29,7 +34,7 @@ function Payments() {
     return (
         <PaymentsContext.Provider value={{payments, setPayments}}>
             <Accordion>
-                {payments.length == 0
+                {payments.length === 0
                     ? <h1>No payments</h1>
                     : payments.map((payment, index) => {
                         return <PaymentAcordBody id={index + 1} key={index+1} payment={payment}/>

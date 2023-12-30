@@ -9,10 +9,12 @@ import Payments from './components/Payments';
 import Charts from './components/Charts';
 import MockDataButton from "./utils/MockDataButton";
 import ProtectedRoute from "./components/ProtectedRoute";
+import {paymentsApi} from "./service/paymentService";
+import {useAuth} from "react-oidc-context";
 
 
 function App() {
-
+    const auth = useAuth();
     return (
         <div className="App">
             <Header/>
@@ -25,6 +27,10 @@ function App() {
                 </Route>
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
+            <button
+                onClick={() => paymentsApi.getPaymentsByUserId("bd1927d8-431a-492c-8376-8fd2c52e26f5", auth.user?.access_token).then(response => console.log(response)).catch(e => console.log(e))}>
+                TEST
+            </button>
         </div>
     );
 }

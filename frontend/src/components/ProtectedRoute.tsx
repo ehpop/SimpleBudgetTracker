@@ -15,7 +15,7 @@ const ProtectedRoute = (): any => {
         return null;
     }
 
-    return Outlet;
+    return <Outlet/>;
 }
 
 export default ProtectedRoute;
