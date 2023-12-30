@@ -2,13 +2,13 @@ import "../styles/Payment.css"
 import {Col, Form, InputGroup, Row, Stack} from "react-bootstrap";
 import {useContext, useState} from "react";
 import Button from "react-bootstrap/Button";
-import axios from "axios";
 import {getDateFromDateTimeString, getDateTimeStringFromDateAndTime} from "../utils/DateTimeUtils";
 import {PaymentsContext} from "./Payments";
 import ControlledPopup from "./ControlledPopup";
+import {paymentsApi} from "../service/paymentApi";
+import {useAuth} from "react-oidc-context";
 
 export interface IPayment {
-    id: number;
     name: string;
     date: string;
     category: string;
@@ -18,8 +18,12 @@ export interface IPayment {
     amount: number;
 }
 
+export interface IPaymentWithId extends IPayment {
+    id: number;
+}
+
 interface IPaymentProps {
-    payment: IPayment;
+    payment: IPaymentWithId;
     isEditable: boolean;
 }
 
@@ -40,6 +44,7 @@ function Payment(props: IPaymentProps) {
     const {payments, setPayments} = useContext(PaymentsContext);
 
     let [formData, setFormData] = useState<IPayment>({...payment});
+    const auth = useAuth();
 
     function onSaveWhenEditable() {
         const editedPayment = {
@@ -52,18 +57,17 @@ function Payment(props: IPaymentProps) {
             userId: payment.userId,
             category: formData.category
         }
-        axios.put('http://localhost:8080/payments/' + payment.id,
-            editedPayment
-        )
+        paymentsApi.updatePayment(editedPayment, auth.user?.access_token)
             .then(function (response) {
                 setIsDisabled(true);
                 setIsEditButtonDisabled(false);
                 setIsSaveButtonDisabled(true);
-                setPayments([...payments.filter((p: IPayment) => p.id !== payment.id), editedPayment]);
+                setPayments([...payments.filter((p: IPaymentWithId) => p.id !== payment.id), response]);
                 setEditedSuccessfullyPopupOpen(true);
             })
             .catch(function (error) {
                 setErrorPopupOpen(true);
+                setErrorPopupMsg(error.response.data);
                 console.log(error);
             });
     }
@@ -71,14 +75,14 @@ function Payment(props: IPaymentProps) {
     function onSaveWhenNotEditable() {
         const newPayment = {
             name: formData.name,
-            description: payment.description,
+            description: formData.description,
             amount: formData.amount,
             date: getDateTimeStringFromDateAndTime(date, new Date().toLocaleTimeString()),
             type: formData.type.toLowerCase(),
-            userId: payment.userId,
+            userId: auth.user?.profile.sub || "",
             category: formData.category
         }
-        axios.post('http://localhost:8080/payments', newPayment)
+        paymentsApi.createPayment(newPayment, auth.user?.access_token)
             .then(function (response) {
                 setAddedSuccessfullyPopupOpen(true);
                 console.log(response);
@@ -103,9 +107,9 @@ function Payment(props: IPaymentProps) {
 
     function ConfirmDeletePopup({isOpen, setIsOpen}: IPopupProps) {
         function deletePayment() {
-            axios.delete('http://localhost:8080/payments/' + payment.id)
+            paymentsApi.deletePayment(payment.id, auth.user?.access_token)
                 .then(function (response) {
-                    setPayments([...payments.filter((p: IPayment) => p.id !== payment.id)]);
+                    setPayments([...payments.filter((p: IPaymentWithId) => p.id !== payment.id)]);
                     setDeletedSuccessfullyPopupOpen(true);
                     console.log(response);
                 })

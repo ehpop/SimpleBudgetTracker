@@ -72,9 +72,11 @@ function Header() {
                                     <Navbar.Text className="ms-3">
                                         Signed in as: <a>{auth.user?.profile.name}</a>
                                     </Navbar.Text>
-                                    <Button variant="outline-danger" onClick={() => auth.signoutRedirect()}>Sign out</Button>
+                                    <Button variant="outline-danger" style={{marginLeft: "5px", padding: "5px"}}
+                                            onClick={() => auth.signoutRedirect()}>Sign out</Button>
                                 </>
-                                : <Button variant="outline-primary" onClick={() => auth.signinRedirect()}>Sign in</Button>
+                                :
+                                <Button variant="outline-primary" onClick={() => auth.signinRedirect()}>Sign in</Button>
                         }
                     </Offcanvas.Body>
                 </Navbar.Offcanvas>

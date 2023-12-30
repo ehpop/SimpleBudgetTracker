@@ -11,7 +11,9 @@ const ProtectedRoute = (): any => {
     } else if (!auth.isAuthenticated) {
         auth.signinRedirect({redirect_uri: window.location.href})
             .then((result) => console.log("Success! ", result))
-            .catch((error) => {console.log(error)});
+            .catch((error) => {
+                console.log(error)
+            });
         return null;
     }
 

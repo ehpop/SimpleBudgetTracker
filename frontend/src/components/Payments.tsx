@@ -1,21 +1,20 @@
 import {Accordion, Stack} from "react-bootstrap";
-import Payment, {IPayment} from "./Payment";
-import axios from "axios";
+import Payment, {IPaymentWithId} from "./Payment";
 
 import "../styles/Payments.css"
 import {createContext, useEffect, useState} from "react";
-import {paymentsApi} from "../service/paymentService";
+import {paymentsApi} from "../service/paymentApi";
 import {useAuth} from "react-oidc-context";
 
 export const PaymentsContext = createContext<any>([]);
 
 function Payments() {
-    const [payments, setPayments] = useState<Array<IPayment>>([]);
+    const [payments, setPayments] = useState<Array<IPaymentWithId>>([]);
     const auth = useAuth();
 
     useEffect(() => {
-        if (auth.user?.profile?.sid) {
-            paymentsApi.getPaymentsByUserId(auth.user?.profile?.sid, auth.user?.access_token)
+        if (auth.user?.profile?.sub) {
+            paymentsApi.getPaymentsByUserId(auth.user?.profile?.sub, auth.user?.access_token)
                 .then((response) => {
                     console.log(response);
                     setPayments(response);
@@ -47,7 +46,7 @@ function Payments() {
 
 interface IPaymentAcordBodyProps {
     id: number;
-    payment: IPayment;
+    payment: IPaymentWithId;
 }
 
 const PaymentAcordBody = ({id, payment}: IPaymentAcordBodyProps) => {

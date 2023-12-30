@@ -1,9 +1,9 @@
-import Payment, {IPayment} from "./Payment";
+import Payment, {IPaymentWithId} from "./Payment";
 
 import '../styles/Home.css';
 
 function Home() {
-    const examplePayment: IPayment = {
+    const examplePayment: IPaymentWithId = {
         id: 1,
         name: "Rent",
         description: "Monthly rent payment.",
