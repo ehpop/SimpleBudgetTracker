@@ -1,3 +1,12 @@
+spring:
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${app.jwt.issuer-uri}
+          jwk-set-uri: ${app.jwt.issuer-uri}/protocol/openid-connect/certs
+  #          public-key-location: classpath:keycloak-key.pub
+
 logging:
   level:
     com.tracker.backend: INFO
@@ -12,29 +21,23 @@ app:
     issuer-uri: ${app.jwt.keycloak}/realms/${app.jwt.realm}
     resource-client-id: frontend-web
 
-# Open API documentation available at http://localhost:8080/budget-tracker-api-ui.html
-springdoc:
-  api-docs:
-    path: /budget-tracker-api-docs
-  swagger-ui:
-    path: /budget-tracker-api-ui.html
-    operations-sorter: method
-    tags-sorter: alpha
+## Open API documentation available at http://localhost:8080/budget-tracker-api-ui.html
+#springdoc:
+#  api-docs:
+#    path: /budget-tracker-api-docs
+#  swagger-ui:
+#    url: /budget-tracker-api-docs
+#    path: /budget-tracker-api-ui.html
+#    operations-sorter: method
+#    tags-sorter: alpha
+#    config-url: /budget-tracker-api-docs/swagger-config
 
-
+---
 # Spring configuration
 spring:
   config:
     activate:
       on-profile: dev
-
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: ${app.jwt.issuer-uri}
-          jwk-set-uri: ${app.jwt.issuer-uri}/protocol/openid-connect/certs
-#          public-key-location: classpath:keycloak-key.pub
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}

@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 @Configuration
 public class JwtConfig {
 
-  @Value("${spring.config.activate.on-profile}")
+  @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
   private String jwkSetUri;
 
   /**

@@ -26,8 +26,10 @@ public class SecurityConfig {
             .requestMatchers(
                 "/actuator/health",
                 "/swagger-ui/**",
-                "/v3/api-docs/**").permitAll()
-            .anyRequest().authenticated()
+                "/v3/api-docs/**")
+            .permitAll()
+            .anyRequest()
+            .authenticated()
         )
 
         // Enable OAuth2 with custom authorities mapping
