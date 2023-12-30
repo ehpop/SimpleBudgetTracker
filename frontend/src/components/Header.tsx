@@ -9,10 +9,13 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Link} from "react-router-dom";
 
 import "../styles/Header.css";
+import {useAuth} from "react-oidc-context";
 
 function Header() {
     const expand: string = "sm";
+    const auth = useAuth();
 
+    // @ts-ignore
     return (
         <Navbar key={expand} expand={expand} className="bg-body-tertiary mb-3">
             <Container fluid>
@@ -63,6 +66,16 @@ function Header() {
                             />
                             <Button variant="outline-success">Search</Button>
                         </Form>
+                        {
+                            auth.isAuthenticated
+                                ? <>
+                                    <Navbar.Text className="ms-3">
+                                        Signed in as: <a>{auth.user?.profile.name}</a>
+                                    </Navbar.Text>
+                                    <Button variant="outline-danger" onClick={() => auth.signoutRedirect()}>Sign out</Button>
+                                </>
+                                : <Button variant="outline-primary" onClick={() => auth.signinRedirect()}>Sign in</Button>
+                        }
                     </Offcanvas.Body>
                 </Navbar.Offcanvas>
             </Container>
