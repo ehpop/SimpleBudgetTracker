@@ -1,4 +1,4 @@
-package com.tracker.backend.configuration;
+package com.tracker.backend.security;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +11,7 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsConfig {
 
-  @Value("${backend.cors.allowed-origins:http://localhost:3000}")
+  @Value("${app.cors.allowed-origins}")
   private List<String> allowedOrigins;
 
   @Bean
