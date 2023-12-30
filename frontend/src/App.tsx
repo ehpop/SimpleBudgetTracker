@@ -8,11 +8,9 @@ import Home from './components/Home';
 import Payments from './components/Payments';
 import Charts from './components/Charts';
 import ProtectedRoute from "./components/ProtectedRoute";
-import {useAuth} from "react-oidc-context";
 
 
 function App() {
-    const auth = useAuth();
     return (
         <div className="App">
             <Header/>
