@@ -6,31 +6,31 @@ import {IPayment} from "./Payment";
 
 interface props {
     payments: Array<IPayment>;
+    typeOfPayment: string;
 }
 
 interface ICategorySums {
     [category: string]: number;
 }
 
-function categoriseData(payments: Array<IPayment>): ICategorySums {
-    return payments.reduce<ICategorySums>((accumulator, item) => {
-        const {category, amount} = item;
-        accumulator[category] = (accumulator[category] || 0) + amount;
-        return accumulator;
-    }, {});
+function categoriseData(payments: Array<IPayment>, type: string): ICategorySums {
+    return payments
+        .filter((p) => p.type === type)
+        .reduce<ICategorySums>((accumulator, item) => {
+            const {category, amount} = item;
+            accumulator[category] = (accumulator[category] || 0) + amount;
+            return accumulator;
+        }, {});
 }
 
-function PieChart({payments}: props) {
+function PieChart({payments, typeOfPayment}: props) {
     const [chartData, setChartData] = useState<any>({
-        labels: payments.map((p) => p.date),
-        datasets: [{
-            label: 'money spent',
-            data: payments.map((p) => p.amount)
-        }]
+        labels: [],
+        datasets: []
     });
 
     useEffect(() => {
-        const categorisedData = categoriseData(payments);
+        const categorisedData = categoriseData(payments, typeOfPayment);
         setChartData({
             labels: Object.keys(categorisedData),
             datasets: [{
