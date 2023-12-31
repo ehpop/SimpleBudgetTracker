@@ -45,9 +45,9 @@ public class PaymentController {
   @GetMapping
   @JsonView(Views.Get.class)
   public ResponseEntity<List<PaymentDTO>> findAll() {
-    log.debug("Finding all payments");
+    log.info("Finding all payments");
     var payments = new ArrayList<>(paymentService.findAll());
-    log.debug("Found all payments: {}", payments);
+    log.info("Found all payments: {}", payments);
     return new ResponseEntity<>(payments, HttpStatus.OK);
   }
 
