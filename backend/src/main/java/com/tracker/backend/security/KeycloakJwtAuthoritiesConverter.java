@@ -78,6 +78,7 @@ public class KeycloakJwtAuthoritiesConverter implements
    * example jwt payload: "scope": { "NOTES" }
    */
   private Stream<GrantedAuthority> getScopeAccess(Jwt jwt) {
-    return jwtGrantedAuthoritiesConverter.convert(jwt).stream();
+    return jwtGrantedAuthoritiesConverter.convert(jwt)
+        .stream();
   }
 }

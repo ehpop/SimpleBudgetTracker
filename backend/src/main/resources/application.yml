@@ -34,7 +34,7 @@ logging:
 # Cors configuration
 app:
   cors:
-    allowed-origins: http://localhost:3000
+    allowed-origins: http://localhost:3000, http://localhost:8081
   jwt:
     keycloak: http://localhost:8443
     realm: app
