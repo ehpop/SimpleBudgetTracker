@@ -37,7 +37,7 @@ function PieChart({payments, typeOfPayment}: props) {
                 data: Object.values(categorisedData)
             }]
         })
-    }, [payments])
+    }, [typeOfPayment, payments])
 
     return (
         <div className="charts-div">

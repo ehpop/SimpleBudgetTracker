@@ -1,24 +1,28 @@
 import {IPayment} from "./Payment";
 import BarChart from "./BarChart";
 import {useEffect, useState} from "react";
-import axios from "axios";
 
 import "../styles/Charts.css"
 import PieChart from "./PieChart";
+import {paymentsApi} from "../service/paymentApi";
+import {useAuth} from "react-oidc-context";
 
 function Charts() {
     const [payments, setPayments] = useState<Array<IPayment>>([]);
+    const auth = useAuth();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/payments')
-            .then(function (response) {
-                console.log(response);
-                setPayments(response.data);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    }, []);
+        if (auth.user?.profile?.sub) {
+            paymentsApi.getPaymentsByUserId(auth.user?.profile?.sub, auth.user?.access_token)
+                .then((response) => {
+                    console.log(response);
+                    setPayments(response);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+    }, [auth.user]);
 
     function charts() {
         return (
@@ -45,7 +49,7 @@ function Charts() {
         <div className="main-charts-div">
             <h1>Charts</h1>
             {
-                payments.length == 0
+                payments.length === 0
                     ? <h1>No payments added yet</h1>
                     : charts()
             }

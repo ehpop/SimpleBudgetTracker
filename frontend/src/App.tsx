@@ -19,7 +19,7 @@ function App() {
                 <Route path="home" element={<Home/>}/>
                 <Route element={<ProtectedRoute/>}>
                     <Route path="payments" element={<Payments/>}/>
-                    <Route path="charts/:type" element={<Charts/>}/>
+                    <Route path="charts" element={<Charts/>}/>
                 </Route>
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
