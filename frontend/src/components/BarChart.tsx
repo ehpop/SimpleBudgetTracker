@@ -36,7 +36,7 @@ function BarChart({payments, typeOfPayment}: props) {
                 borderColor: CHART_COLORS[typeOfPayment]['borderColor'],
             }]
         })
-    }, [payments])
+    }, [payments, typeOfPayment, chartData])
 
     return (
         <div className="charts-div">

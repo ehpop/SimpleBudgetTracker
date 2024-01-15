@@ -120,12 +120,12 @@ function Payment(props: IPaymentProps) {
         }
 
         const buttons = [
-            <Button className="alert-success" onClick={() => {
+            <Button variant="danger" onClick={() => {
                 setIsOpen && setIsOpen(false);
                 deletePayment();
             }
             }>Yes</Button>,
-            <Button className="alert-danger" onClick={
+            <Button variant="primary" onClick={
                 () => setIsOpen && setIsOpen(false)
             }>No</Button>
         ]
